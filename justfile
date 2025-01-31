@@ -3,3 +3,6 @@ test:
 
 review:
 	cargo insta review --all
+
+fmt:
+	cargo fmt --all
