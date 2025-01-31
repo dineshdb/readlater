@@ -1,0 +1,8 @@
+---
+source: pkg/pocket/src/modify.rs
+expression: "ModifyItem::favorite(123456789)"
+---
+{
+  "action": "favorite",
+  "item_id": 123456789
+}

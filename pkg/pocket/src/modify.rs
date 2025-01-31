@@ -1,5 +1,7 @@
 use serde::Serialize;
+use std::vec;
 use url::Url;
+use util::ser::serialize_vec_as_comma_separated;
 
 #[derive(Serialize)]
 pub struct PocketSendRequest<'a, T> {
@@ -81,8 +83,8 @@ pub struct AddUrlRequest {
     url: Url,
     #[serde(skip_serializing_if = "Option::is_none")]
     title: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    tags: Option<String>,
+    #[serde(serialize_with = "serialize_vec_as_comma_separated")]
+    tags: Vec<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     tweet_id: Option<String>,
 }
@@ -93,7 +95,7 @@ impl AddUrlRequest {
             action: Action::Add,
             url,
             title: None,
-            tags: None,
+            tags: vec![],
             tweet_id: None,
         }
     }
@@ -135,11 +137,12 @@ impl TagDelete {
 pub struct ItemTagAction {
     action: Action,
     item_id: u64,
-    tags: String,
+    #[serde(serialize_with = "serialize_vec_as_comma_separated")]
+    tags: Vec<String>,
 }
 
 impl ItemTagAction {
-    pub fn add_tags(item_id: u64, tags: String) -> ItemTagAction {
+    pub fn add_tags(item_id: u64, tags: Vec<String>) -> ItemTagAction {
         ItemTagAction {
             action: Action::TagsReplace,
             item_id,
@@ -147,7 +150,7 @@ impl ItemTagAction {
         }
     }
 
-    pub fn replace_tags(item_id: u64, tags: String) -> ItemTagAction {
+    pub fn replace_tags(item_id: u64, tags: Vec<String>) -> ItemTagAction {
         ItemTagAction {
             action: Action::TagsReplace,
             item_id,
@@ -155,11 +158,72 @@ impl ItemTagAction {
         }
     }
 
-    pub fn remove_tags(item_id: u64, tags: String) -> ItemTagAction {
+    pub fn remove_tags(item_id: u64, tags: Vec<String>) -> ItemTagAction {
         ItemTagAction {
             action: Action::TagsReplace,
             item_id,
             tags,
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn archive_item() {
+        insta::assert_json_snapshot!(ModifyItem::archive(123456789));
+    }
+
+    #[test]
+    fn readd_item() {
+        insta::assert_json_snapshot!(ModifyItem::readd(123456789));
+    }
+
+    #[test]
+    fn favorite_item() {
+        insta::assert_json_snapshot!(ModifyItem::favorite(123456789));
+    }
+
+    #[test]
+    fn unfavorite_item() {
+        insta::assert_json_snapshot!(ModifyItem::unfavorite(123456789));
+    }
+
+    #[test]
+    fn delete_item() {
+        insta::assert_json_snapshot!(ModifyItem::delete(123456789));
+    }
+
+    #[test]
+    fn add_tags() {
+        insta::assert_json_snapshot!(ItemTagAction::add_tags(
+            123456789,
+            vec!["tag1".to_string(), "tag2".to_string()]
+        ));
+    }
+
+    #[test]
+    fn clear_tags() {
+        insta::assert_json_snapshot!(ModifyItem::clear_tags(123456789));
+    }
+
+    #[test]
+    fn test_add_url_request() {
+        use url::Url;
+
+        let url = Url::parse("https://example.com").unwrap();
+        insta::assert_json_snapshot!(AddUrlRequest::new(url));
+    }
+
+    #[test]
+    fn test_tag_rename() {
+        insta::assert_json_snapshot!(TagRename::new("old_tag".to_string(), "new_tag".to_string()));
+    }
+
+    #[test]
+    fn test_tag_delete() {
+        insta::assert_json_snapshot!(TagDelete::new("tag".to_string()));
     }
 }

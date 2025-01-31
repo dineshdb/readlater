@@ -1,0 +1,8 @@
+---
+source: pkg/pocket/src/modify.rs
+expression: "ModifyItem::readd(123456789)"
+---
+{
+  "action": "readd",
+  "item_id": 123456789
+}

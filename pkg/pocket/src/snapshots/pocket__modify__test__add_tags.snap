@@ -1,0 +1,9 @@
+---
+source: pkg/pocket/src/modify.rs
+expression: "ItemTagAction::add_tags(123456789,\nvec![\"tag1\".to_string(), \"tag2\".to_string()])"
+---
+{
+  "action": "tags_replace",
+  "item_id": 123456789,
+  "tags": "tag1,tag2"
+}

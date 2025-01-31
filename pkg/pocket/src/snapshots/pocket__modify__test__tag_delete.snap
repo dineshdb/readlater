@@ -1,0 +1,8 @@
+---
+source: pkg/pocket/src/modify.rs
+expression: "TagDelete::new(\"tag\".to_string())"
+---
+{
+  "action": "tags_delete",
+  "tag": "tag"
+}

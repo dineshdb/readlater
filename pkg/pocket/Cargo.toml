@@ -10,3 +10,4 @@ serde_json.workspace = true
 reqwest.workspace = true
 url.workspace = true
 util = { path = "../util" }
+insta.workspace = true

@@ -1,0 +1,8 @@
+---
+source: pkg/pocket/src/modify.rs
+expression: "ModifyItem::clear_tags(123456789)"
+---
+{
+  "action": "tags_clear",
+  "item_id": 123456789
+}

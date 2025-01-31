@@ -1,0 +1,9 @@
+---
+source: pkg/pocket/src/modify.rs
+expression: "TagRename::new(\"old_tag\".to_string(), \"new_tag\".to_string())"
+---
+{
+  "action": "tags_rename",
+  "old_tag": "old_tag",
+  "new_tag": "new_tag"
+}

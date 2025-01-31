@@ -1,0 +1,17 @@
+---
+source: pkg/pocket/src/retrieve.rs
+expression: options
+---
+{
+  "state": "archive",
+  "favorite": 1,
+  "tag": "linux",
+  "content_type": "article",
+  "sort": "title",
+  "detail_type": "complete",
+  "search": "example",
+  "domain": "example.org",
+  "since": "1738297033",
+  "count": 10,
+  "offset": 10
+}

@@ -1,0 +1,8 @@
+---
+source: pkg/pocket/src/modify.rs
+expression: "ModifyItem::archive(123456789)"
+---
+{
+  "action": "archive",
+  "item_id": 123456789
+}

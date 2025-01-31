@@ -28,6 +28,7 @@ pub enum DetailType {
 pub enum Tag {
     #[serde(rename = "_untagged_")]
     Untagged,
+    #[serde(untagged)]
     Value(String),
 }
 
@@ -104,5 +105,34 @@ impl Default for GetOptions {
             count: 10,
             offset: None,
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_get_options_default() {
+        let options = GetOptions::default();
+        insta::assert_json_snapshot!(options);
+    }
+
+    #[test]
+    fn test_get_options() {
+        let options = GetOptions {
+            state: Some(State::Archive),
+            favorite: Some(true),
+            tag: Some(Tag::Value("linux".to_string())),
+            content_type: Some(ContentType::Article),
+            sort: Some(SortBy::Title),
+            detail_type: Some(DetailType::Complete),
+            search: Some("example".to_string()),
+            domain: Some("example.org".to_string()),
+            since: Some("1738297033".to_string()),
+            count: 10,
+            offset: Some(10),
+        };
+        insta::assert_json_snapshot!(options);
     }
 }

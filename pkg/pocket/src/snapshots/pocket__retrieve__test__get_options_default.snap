@@ -1,0 +1,8 @@
+---
+source: pkg/pocket/src/retrieve.rs
+expression: options
+---
+{
+  "state": "unread",
+  "count": 10
+}
