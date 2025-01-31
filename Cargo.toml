@@ -1,16 +1,26 @@
 [package]
-name = "getpocket"
+name = "readlater"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+url = {version = "2.5.4", features = ["serde"]}
+pocket = {path = "pkg/pocket"}
+
 anyhow = "1.0.95"
 dotenv = "0.15.0"
-serde_json = "1.0.138"
-thiserror = "2.0.11"
-serde = { version = "1.0", features = ["derive"] }
-url = {version = "2.5.4", features = ["serde"]}
-url_serde = "0.2.0"
-reqwest = { version = "0.12.12", features = ["json"] }
 clap = { version = "4.5.27", features = ["derive"] }
 tokio = { version = "1", features = ["full"] }
+open = "5.3.2"
+
+[workspace]
+members = [
+    "pkg/pocket", "pkg/util",
+]
+
+[workspace.dependencies]
+thiserror = "2.0.11"
+serde_json = "1.0.138"
+serde = { version = "1.0", features = ["derive"] }
+url = {version = "2.5.4", features = ["serde"]}
+reqwest = { version = "0.12.12", features = ["json"] }

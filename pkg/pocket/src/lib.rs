@@ -43,11 +43,11 @@ impl<'a, T> PockeRequest<'a, T> {
 }
 
 impl<'a> PocketClient<'a> {
-    pub fn new(consumer_key: &'a str, access_token: &'a str, client: Client) -> PocketClient<'a> {
+    pub fn new(consumer_key: &'a str, access_token: &'a str) -> PocketClient<'a> {
         PocketClient {
             consumer_key,
             access_token,
-            client,
+            client: reqwest::Client::new(),
         }
     }
 

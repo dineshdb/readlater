@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
-use crate::der::bool_from_number;
-use crate::ser::serialize_option_bool_as_int;
 use serde::{Deserialize, Serialize};
+use util::der::bool_from_number;
+use util::ser::serialize_option_bool_as_int;
 
 use super::item::Item;
 
