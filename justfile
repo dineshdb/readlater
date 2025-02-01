@@ -6,3 +6,6 @@ review:
 
 fmt:
 	cargo fmt --all
+
+install:
+	cargo install --path . --force
