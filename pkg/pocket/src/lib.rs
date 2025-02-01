@@ -84,7 +84,7 @@ impl<'a> PocketClient<'a> {
     }
 
     pub async fn get(&mut self, req: GetOptions) -> PocketResult<RetrieveResponse> {
-        let request = PockeRequest::new(&self.consumer_key, &self.access_token, req);
+        let request = PockeRequest::new(self.consumer_key, self.access_token, req);
         self.request(GET_URL, &request)
             .await?
             .json::<RetrieveResponse>()
@@ -96,7 +96,7 @@ impl<'a> PocketClient<'a> {
     }
 
     pub async fn add(&mut self, req: Vec<AddUrlRequest>) -> PocketResult<()> {
-        let request = PocketSendRequest::new(&self.consumer_key, &self.access_token, req);
+        let request = PocketSendRequest::new(self.consumer_key, self.access_token, req);
         let _res = self.request(SEND_URL, &request).await?;
         Ok(())
     }
@@ -106,7 +106,7 @@ impl<'a> PocketClient<'a> {
             .into_iter()
             .map(|item_id| ModifyItem::new(Action::Archive, item_id))
             .collect();
-        let request = PocketSendRequest::new(&self.consumer_key, &self.access_token, actions);
+        let request = PocketSendRequest::new(self.consumer_key, self.access_token, actions);
         let _res = self.request(SEND_URL, &request).await?;
         Ok(())
     }

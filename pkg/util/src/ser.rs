@@ -13,10 +13,7 @@ where
     }
 }
 
-pub fn serialize_vec_as_comma_separated<S>(
-    vec: &Vec<String>,
-    serializer: S,
-) -> Result<S::Ok, S::Error>
+pub fn serialize_vec_as_comma_separated<S>(vec: &[String], serializer: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {

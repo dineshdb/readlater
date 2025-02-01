@@ -83,7 +83,10 @@ pub struct AddUrlRequest {
     url: Url,
     #[serde(skip_serializing_if = "Option::is_none")]
     title: Option<String>,
-    #[serde(serialize_with = "serialize_vec_as_comma_separated")]
+    #[serde(
+        serialize_with = "serialize_vec_as_comma_separated",
+        skip_serializing_if = "Vec::is_empty"
+    )]
     tags: Vec<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     tweet_id: Option<String>,
@@ -98,6 +101,11 @@ impl AddUrlRequest {
             tags: vec![],
             tweet_id: None,
         }
+    }
+
+    pub fn tags(mut self, tags: Vec<String>) -> AddUrlRequest {
+        self.tags = tags;
+        self
     }
 }
 

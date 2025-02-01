@@ -21,8 +21,8 @@ javascript: (function () {
 
 ## Roadmap
 
-- [ ] Protocol Handler
-  - [ ] Save new urls to Pocket
+- [x] Protocol Handler
+  - [x] Save new urls to Pocket
 - [ ] CI
   - [ ] Tests
   - [ ] Release Binaries on Github packages

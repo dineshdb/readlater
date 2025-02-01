@@ -1,4 +1,6 @@
-use clap::{command, Parser, Subcommand};
+use std::collections::HashMap;
+
+use clap::{Parser, Subcommand};
 use pocket::{modify::AddUrlRequest, PocketClient};
 use readlater::config::get_config;
 use url::Url;
@@ -68,15 +70,35 @@ async fn main() {
             HandlerCommands::Register => readlater::proto_handler::register_url_handler(),
         },
         Commands::Handle { url } => {
-            let mut file = std::fs::OpenOptions::new()
-                .write(true)
-                .create(true)
-                .append(true)
-                .open("url.txt")
+            let url_parts = url::Url::parse(url.as_ref()).unwrap();
+            assert_eq!(url_parts.scheme(), "readlater");
+            let query_params = url_parts.query_pairs().collect::<HashMap<_, _>>();
+
+            let url = query_params.get("url");
+            if url.is_none() {
+                eprintln!("No url provided");
+                return;
+            }
+            let url = url.unwrap().to_string();
+            let url = Url::parse(&url).expect("malformed url");
+
+            let tags = query_params
+                .get("tags")
+                .map(|tags| tags.to_string())
+                .unwrap_or_default();
+
+            let mut tags = tags
+                .split(',')
+                .map(|tag| tag.to_string())
+                .filter(|s| !s.is_empty())
+                .collect::<Vec<_>>();
+            tags.push("readlater".to_string());
+
+            let mut pocket = PocketClient::new(&config.consumer_key, &config.access_token);
+            pocket
+                .add(vec![AddUrlRequest::new(url).tags(tags)])
+                .await
                 .unwrap();
-            use std::io::Write;
-            file.write_all(url.as_str().as_bytes()).unwrap();
-            file.write_all(b"\n").unwrap();
         }
     }
 }
