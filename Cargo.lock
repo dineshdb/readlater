@@ -808,6 +808,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "native_messaging"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "26fa39d9b8f1347194170a4e11a1c6ea97d57065547231445aa79f0dba0af9c5"
+dependencies = [
+ "serde",
+ "serde_json",
+ "tokio",
+]
+
+[[package]]
 name = "object"
 version = "0.36.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -988,8 +999,11 @@ dependencies = [
  "anyhow",
  "clap",
  "dotenv",
+ "native_messaging",
  "open",
  "pocket",
+ "serde",
+ "serde_json",
  "tokio",
  "url",
 ]

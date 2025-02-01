@@ -1,8 +1,14 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, path::PathBuf};
 
 use clap::{Parser, Subcommand};
 use pocket::{modify::AddUrlRequest, PocketClient};
-use readlater::config::get_config;
+use readlater::{
+    config::get_config,
+    native_host::{
+        install::{install_linux, Manifest},
+        native_host_handler,
+    },
+};
 use url::Url;
 #[derive(Parser)]
 #[command(author, version, about)]
@@ -17,10 +23,7 @@ enum Commands {
         #[clap(subcommand)]
         subcommand: PocketCommands,
     },
-    Handler {
-        #[clap(subcommand)]
-        subcommand: HandlerCommands,
-    },
+    Register {},
     Handle {
         #[arg(long)]
         url: Url,
@@ -41,8 +44,21 @@ enum PocketCommands {
 
 #[tokio::main]
 async fn main() {
-    let args = Args::parse();
     let config = get_config();
+
+    let args: Vec<String> = std::env::args().collect();
+
+    // todo: proper handling so that we don't have to do this
+    if args
+        .into_iter()
+        .any(|arg| arg == "readlater@dbhattarai.info.np")
+    {
+        // we were called from firefox extension
+        native_host_handler(config).await;
+        return;
+    }
+
+    let args = Args::parse();
     match args.command {
         Commands::Pocket { subcommand } => {
             let mut pocket = PocketClient::new(&config.consumer_key, &config.access_token);
@@ -66,9 +82,20 @@ async fn main() {
                 }
             }
         }
-        Commands::Handler { subcommand } => match subcommand {
-            HandlerCommands::Register => readlater::proto_handler::register_url_handler(),
-        },
+        Commands::Register {} => {
+            let cli = std::env::current_exe().unwrap();
+            let cli = cli.to_str().to_owned().unwrap();
+            readlater::proto_handler::register_url_handler();
+            let manifest = Manifest {
+                name: "readlater".to_string(),
+                description: "readlater native messaging host".to_string(),
+                path: PathBuf::from(cli),
+                io_type: "stdio".to_string(),
+                allowed_extensions: Some(vec!["readlater@dbhattarai.info.np".to_string()]),
+            };
+
+            install_linux(&manifest).unwrap();
+        }
         Commands::Handle { url } => {
             let url_parts = url::Url::parse(url.as_ref()).unwrap();
             assert_eq!(url_parts.scheme(), "readlater");

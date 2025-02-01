@@ -1,29 +1,31 @@
-# `readlater://`
+# ![readlater:// logo](webext/icons/icon.svg "Logo")
 
 > readlater://save?url=https://example.org&tags
 
 A protocol handler that will save any articles it receives to getpocket.
 
-## Roadmap
+## Supported Features
 
-- [x] Protocol Handler
-  - [x] Save new urls to Pocket
-- [ ] Get access token from keyring or `readlater.conf`
-- [-] WebExtension
-  - [-] Add a `readlater://` button that saves current tab to `readlater://` via native extension
-  - [ ] Insert `readlater://` links in web pages for easier saving to `readlater://`
-- [ ] CI
-  - [ ] Tests
-  - [ ] Release Binaries on Github packages
-  - [ ] Add a install script
+This supports handling `readlater://save?url=<url>&title=<title>&tags=<tags>`
+without installing web extension. If you install the webextension, it provides
+additional features such as:
+
+- toolbar button to save current url to pocket by clicking it.
+
+Alternatively, you can use bookmarket to add items to the getpocket. Or just
+paste properly formatted link to url bar.
 
 ## Setup
 
 - Install the binary `cargo install --git https://github.com/dineshdb/readlater`
-- Register protocol handler `readlater handler register`
+- Register protocol handler and WebExtension native-host `readlater register`
 - Provide Pocket authentication `POCKET_CONSUMER_KEY`, `POCKET_ACCESS_TOKEN` via
   env variable.
-- Start using the protocol handler by using the bookmarklet
+
+## Test
+
+Add this [link](readlater://save?url=https://github.com/dineshdb/readlater) to
+pocket using `readlater://`
 
 ## Bookmarklet
 
@@ -38,6 +40,23 @@ javascript: (function () {
   }
 })();
 ```
+
+## Roadmap
+
+- [x] Protocol Handler
+  - [x] Save new urls to Pocket
+- [ ] Get access token from keyring or `readlater.conf`
+- [-] WebExtension
+  - [x] Add a `readlater://` button that saves current tab to `readlater://` via
+        native extension
+  - [ ] Insert `readlater://` links in web pages for easier saving to
+        `readlater://`
+  - [ ] Release the web extension
+- [ ] Decouple it from Pocket and make it pluggable.
+- [ ] CI
+  - [ ] Tests
+  - [ ] Release Binaries on Github packages
+  - [ ] Add a install script
 
 ## License
 

@@ -4,6 +4,5 @@ expression: "AddUrlRequest::new(url)"
 ---
 {
   "action": "add",
-  "url": "https://example.com/",
-  "tags": ""
+  "url": "https://example.com/"
 }
