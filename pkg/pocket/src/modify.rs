@@ -79,17 +79,17 @@ impl ModifyItem {
 
 #[derive(Serialize)]
 pub struct AddUrlRequest {
-    action: Action,
-    url: Url,
+    pub action: Action,
+    pub url: Url,
     #[serde(skip_serializing_if = "Option::is_none")]
-    title: Option<String>,
+    pub title: Option<String>,
     #[serde(
         serialize_with = "serialize_vec_as_comma_separated",
         skip_serializing_if = "Vec::is_empty"
     )]
-    tags: Vec<String>,
+    pub tags: Vec<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    tweet_id: Option<String>,
+    pub tweet_id: Option<String>,
 }
 
 impl AddUrlRequest {

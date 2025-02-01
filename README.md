@@ -1,5 +1,7 @@
 # `readlater://`
 
+![webext/icons/icon.svg]
+
 > readlater://save?url=https://example.org&tags
 
 A protocol handler that will save any articles it receives to getpocket.

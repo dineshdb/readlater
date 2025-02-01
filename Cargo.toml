@@ -12,6 +12,9 @@ dotenv = "0.15.0"
 clap = { version = "4.5.27", features = ["derive"] }
 tokio = { version = "1", features = ["full"] }
 open = "5.3.2"
+native_messaging = "0.1.1"
+serde_json = "1.0.138"
+serde = { version = "1.0", features = ["derive"] }
 
 [workspace]
 members = [

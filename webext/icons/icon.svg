@@ -1,0 +1,5 @@
+<svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+  <rect width="50" height="50" fill="#f5f5f5" rx="8"/>
+  <text x="50%" y="65%" font-family="Arial, sans-serif" font-size="32" fill="#333" 
+	text-anchor="middle" alignment-baseline="middle">r://</text>
+</svg>
