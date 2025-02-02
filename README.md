@@ -7,8 +7,9 @@ A protocol handler that will save any articles it receives to getpocket.
 ## Supported Features
 
 This supports handling `readlater://save?url=<url>&title=<title>&tags=<tags>`
-without installing web extension. If you install the webextension, it provides
-additional features such as:
+without installing web extension. If you install the
+[webextension](https://addons.mozilla.org/en-US/firefox/addon/read_later/), it
+provides additional features such as:
 
 - toolbar button to save current url to pocket by clicking it.
 
@@ -24,8 +25,10 @@ paste properly formatted link to url bar.
 
 ## Test
 
-Add this [link](readlater://save?url=https://github.com/dineshdb/readlater) to
-pocket using `readlater://`
+Visit the [hosted version of this page](https://dbhattarai.info.np/readlater/)
+and then click
+[this link](readlater://save?url=https://github.com/dineshdb/readlater) to add
+the this repo url to pocket using `readlater://`.
 
 ## Bookmarklet
 
