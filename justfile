@@ -24,6 +24,9 @@ build:
 	ffmpeg -i webext/icons/icon.svg -y -vf scale=38:38 webext/icons/icon-38.png
 	ffmpeg -i webext/icons/icon.svg -y -vf scale=24:24 webext/icons/icon-24.png
 	ffmpeg -i webext/icons/icon.svg -y -vf scale=19:19 webext/icons/icon-19.png
+	ffmpeg -i webext/icons/icon-red.svg -y -vf scale=48:48 webext/icons/icon-red-48.png
+	ffmpeg -i webext/icons/icon-green.svg -y -vf scale=48:48 webext/icons/icon-green-48.png
+	ffmpeg -i webext/icons/icon-orange.svg -y -vf scale=48:48 webext/icons/icon-orange-48.png
 	cd webext; pkgx npx -y web-ext build --overwrite-dest
 
 webext:

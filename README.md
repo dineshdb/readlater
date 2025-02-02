@@ -55,7 +55,8 @@ javascript: (function () {
   - [ ] Insert `readlater://` links in web pages for easier saving to
         `readlater://`
   - [x] Release the web extension
-  - [ ] Change toolbar icon based on result
+  - [x] Change toolbar icon based on result
+  - [ ] Keyboard shortcut
 - [ ] Decouple it from Pocket and make it pluggable.
 - [-] CI
   - [x] Tests
