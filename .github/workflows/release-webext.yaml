@@ -23,9 +23,6 @@ jobs:
           cmd: build
           source: webext
 
-      - name: "Collect sources"
-        run: git archive --format=zip --output=sources.zip ${{ github.ref }}
-
       - name: "Collect metadata"
         id: metadata
         run: echo "json=$(jq -c . < webext/amo_metadata.json)" >> $GITHUB_OUTPUT
@@ -36,7 +33,6 @@ jobs:
         with:
           cmd: sign
           source: ${{ steps.web-ext-build.outputs.target }}
-          sourceCode: sources.zip
           channel: listed # listed or unlisted
 
           metaDataFile: webext/amo_metadata.json
