@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "readlater://",
-  "version": "1.4",
+  "version": "1.4.1",
   "description": "Save files to readlater:// using native host",
   "icons": {
     "48": "icons/icon-48.png",

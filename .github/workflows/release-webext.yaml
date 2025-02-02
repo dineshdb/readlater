@@ -40,7 +40,7 @@ jobs:
           channel: listed # listed or unlisted
 
           metaDataFile: webext/amo_metadata.json
-          approvalNotes: "Please find more information at https://github.com/kewisch/action-web-ext"
+          approvalNotes: "Please find more information at https://github.com/dineshdb/readlater"
           releaseNotes: ${{ github.event.release.body }}
           license: MIT
           apiKey: ${{ secrets.AMO_SIGN_KEY }}
