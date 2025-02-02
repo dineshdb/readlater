@@ -1,0 +1,11 @@
+{
+  "summary": {
+    "en-US": "webextension for adding files to readlater:// using native host"
+  },
+  "categories": [
+    "other"
+  ],
+  "version": {
+    "license": "MIT"
+  }
+}

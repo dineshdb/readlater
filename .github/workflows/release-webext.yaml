@@ -1,0 +1,54 @@
+name: "Publish"
+on:
+  release:
+    types: [published]
+
+  push:
+    branches:
+      - main
+
+jobs:
+  sign:
+    name: "Release"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+
+      - name: "web-ext lint"
+        uses: kewisch/action-web-ext@v1
+        with:
+          cmd: lint
+          source: webext
+          channel: listed
+
+      - name: "web-ext build"
+        id: web-ext-build
+        uses: kewisch/action-web-ext@v1
+        with:
+          cmd: build
+          source: webext
+
+      - name: "Collect sources"
+        run: git archive --format=zip --output=sources.zip ${{ github.ref }}
+
+      - name: "Collect metadata"
+        id: metadata
+        run: echo "json=$(jq -c . < webext/amo_metadata.json)" >> $GITHUB_OUTPUT
+
+      - name: "web-ext sign AMO"
+        id: web-ext-sign
+        uses: kewisch/action-web-ext@v1
+        with:
+          cmd: sign
+          source: ${{ steps.web-ext-build.outputs.target }}
+          sourceCode: sources.zip
+          channel: listed # listed or unlisted
+
+          metaDataFile: webext/amo_metadata.json
+          approvalNotes: "Please find more information at https://github.com/kewisch/action-web-ext"
+          releaseNotes: ${{ github.event.release.body }}
+          license: MIT
+          apiKey: ${{ secrets.AMO_SIGN_KEY }}
+          apiSecret: ${{ secrets.AMO_SIGN_SECRET }}
+          timeout: 900000

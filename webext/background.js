@@ -5,5 +5,5 @@ browser.browserAction.onClicked.addListener(async (tab) => {
     url,
     title,
   });
-  console.log(res);
+  console.debug(res);
 });

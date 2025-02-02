@@ -1,11 +1,11 @@
 {
   "manifest_version": 2,
   "name": "readlater://",
-  "version": "1.0",
+  "version": "1.1",
   "description": "Save files to readlater:// using native host",
   "icons": {
     "48": "icons/icon-48.png",
-    "24": "icons/icon-32.png"
+    "24": "icons/icon-24.png"
   },
   "permissions": [
     "activeTab",
@@ -21,7 +21,7 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "readlater@dbhattarai.info.np",
-      "strict_min_version": "50.0"
+      "strict_min_version": "58.0"
     }
   },
   "background": {
