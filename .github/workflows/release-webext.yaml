@@ -1,12 +1,6 @@
-name: "Publish"
+name: "Publish WebExtension"
 on:
-  release:
-    types: [published]
-
-  push:
-    branches:
-      - main
-
+  workflow_dispatch:
 jobs:
   sign:
     name: "Release"

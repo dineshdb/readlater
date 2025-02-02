@@ -51,10 +51,11 @@ javascript: (function () {
         native extension
   - [ ] Insert `readlater://` links in web pages for easier saving to
         `readlater://`
-  - [ ] Release the web extension
+  - [x] Release the web extension
+  - [ ] Change toolbar icon based on result
 - [ ] Decouple it from Pocket and make it pluggable.
-- [ ] CI
-  - [ ] Tests
+- [-] CI
+  - [x] Tests
   - [ ] Release Binaries on Github packages
   - [ ] Add a install script
 
