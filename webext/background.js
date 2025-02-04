@@ -4,7 +4,7 @@ const successIcon = "green";
 const errorIcon = "red";
 
 const setIcon = (variant) => {
-  browser.browserAction.setIcon({ path: `icons/icon-${variant}-48.png` });
+  browser.browserAction.setIcon({ path: `icons/icon-${variant}-38.png` });
 };
 
 browser.browserAction.onClicked.addListener(async (tab) => {
