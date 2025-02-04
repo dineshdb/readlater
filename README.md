@@ -62,7 +62,8 @@ javascript: (function () {
   - [x] Tests
   - [ ] Release Binaries on Github packages
   - [ ] Add a install script
-- [ ] Get access token from keyring or `readlater.conf`
+- [x] Get access token from keyring or `readlater.conf`
+- [ ] Get access token via login
 - [ ] Decouple it from Pocket and make it pluggable.
 
 ## License

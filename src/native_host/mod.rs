@@ -41,7 +41,7 @@ impl Result {
 }
 
 pub async fn native_host_handler(config: Config) {
-    let mut pocket = PocketClient::new(&config.consumer_key, &config.access_token);
+    let mut pocket = PocketClient::new(&config.pocket_consumer_key, &config.pocket_access_token);
 
     match get_message().await {
         Ok(message) => {

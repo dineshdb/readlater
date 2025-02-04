@@ -44,7 +44,7 @@ enum PocketCommands {
 
 #[tokio::main]
 async fn main() {
-    let config = get_config();
+    let config = get_config().expect("error loading config");
 
     let args: Vec<String> = std::env::args().collect();
 
@@ -61,7 +61,8 @@ async fn main() {
     let args = Args::parse();
     match args.command {
         Commands::Pocket { subcommand } => {
-            let mut pocket = PocketClient::new(&config.consumer_key, &config.access_token);
+            let mut pocket =
+                PocketClient::new(&config.pocket_consumer_key, &config.pocket_access_token);
 
             match subcommand {
                 PocketCommands::Get => {
@@ -121,7 +122,8 @@ async fn main() {
                 .collect::<Vec<_>>();
             tags.push("readlater".to_string());
 
-            let mut pocket = PocketClient::new(&config.consumer_key, &config.access_token);
+            let mut pocket =
+                PocketClient::new(&config.pocket_consumer_key, &config.pocket_access_token);
             pocket
                 .add(vec![AddUrlRequest::new(url).tags(tags)])
                 .await
