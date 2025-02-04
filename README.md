@@ -46,22 +46,24 @@ javascript: (function () {
 
 ## Roadmap
 
-- [x] Protocol Handler
+- Protocol Handler
   - [x] Save new urls to Pocket
-- [ ] Get access token from keyring or `readlater.conf`
-- [-] WebExtension
+- WebExtension
   - [x] Add a `readlater://` button that saves current tab to `readlater://` via
         native extension
-  - [ ] Insert `readlater://` links in web pages for easier saving to
-        `readlater://`
   - [x] Release the web extension
   - [x] Change toolbar icon based on result
+  - [x] Firefox(on Linux) Support
+  - [ ] Insert `readlater://` links in web pages for easier saving to
+        `readlater://`
   - [ ] Keyboard shortcut
-- [ ] Decouple it from Pocket and make it pluggable.
-- [-] CI
+  - [ ] Support for Chrome and Chromium based browsers
+- CI
   - [x] Tests
   - [ ] Release Binaries on Github packages
   - [ ] Add a install script
+- [ ] Get access token from keyring or `readlater.conf`
+- [ ] Decouple it from Pocket and make it pluggable.
 
 ## License
 

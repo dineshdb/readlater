@@ -1,4 +1,3 @@
-
 const defaultIcon = "gray";
 const inProgressIcon = "orange";
 const successIcon = "green";
