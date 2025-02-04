@@ -3,8 +3,8 @@ const inProgressIcon = "orange";
 const successIcon = "green";
 const errorIcon = "red";
 
-const setIcon = (icon) => {
-  browser.browserAction.setIcon({ path: `icons/icon-${icon}-48.png` });
+const setIcon = (variant) => {
+  browser.browserAction.setIcon({ path: `icons/icon-${variant}-48.png` });
 };
 
 browser.browserAction.onClicked.addListener(async (tab) => {

@@ -1,4 +1,4 @@
-# ![readlater:// logo](webext/icons/icon.svg "Logo")
+# ![readlater:// logo](webext/icons/icon-gray-128.png "Logo")
 
 > readlater://save?url=https://example.org&tags
 
