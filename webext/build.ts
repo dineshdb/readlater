@@ -28,6 +28,7 @@ buildIcon("gray", "rl", "#f5f5f5", "#333", 19);
 buildIcon("gray", "rl", "#f5f5f5", "#333", 24);
 buildIcon("gray", "rl", "#f5f5f5", "#333", 38);
 buildIcon("gray", "rl", "#f5f5f5", "#333", 48);
+buildIcon("gray", "rl", "#f5f5f5", "#333", 96);
 buildIcon("orange", "rl", "orange", "white", 48);
 buildIcon("green", "rl", "green", "white", 48);
 buildIcon("red", "rl", "red", "white", 48);
