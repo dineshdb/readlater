@@ -27,14 +27,22 @@ export function buildIcon(
 
 const icons = {
   gray: {
-    background: "#f5f5f5", color: "#333", sizes: [
-      16, 19, 32, 38, 48, 64, 128,
-    ]
+    background: "#f5f5f5",
+    color: "#333",
+    sizes: [
+      16,
+      19,
+      32,
+      38,
+      48,
+      64,
+      128,
+    ],
   },
   orange: { background: "orange", color: "white", sizes: [19, 38] },
   green: { background: "green", color: "white", sizes: [19, 38] },
   red: { background: "red", color: "white", sizes: [19, 38] },
-}
+};
 
 for (const [variant, { background, color, sizes }] of Object.entries(icons)) {
   for (const size of sizes) {
