@@ -25,12 +25,19 @@ export function buildIcon(
   );
 }
 
-buildIcon("gray", "rl", "#f5f5f5", "#333", 128);
-buildIcon("gray", "rl", "#f5f5f5", "#333", 19);
-buildIcon("gray", "rl", "#f5f5f5", "#333", 24);
-buildIcon("gray", "rl", "#f5f5f5", "#333", 38);
-buildIcon("gray", "rl", "#f5f5f5", "#333", 48);
-buildIcon("gray", "rl", "#f5f5f5", "#333", 96);
-buildIcon("orange", "rl", "orange", "white", 48);
-buildIcon("green", "rl", "green", "white", 48);
-buildIcon("red", "rl", "red", "white", 48);
+const icons = {
+  gray: {
+    background: "#f5f5f5", color: "#333", sizes: [
+      16, 19, 32, 38, 48, 64, 128,
+    ]
+  },
+  orange: { background: "orange", color: "white", sizes: [19, 38] },
+  green: { background: "green", color: "white", sizes: [19, 38] },
+  red: { background: "red", color: "white", sizes: [19, 38] },
+}
+
+for (const [variant, { background, color, sizes }] of Object.entries(icons)) {
+  for (const size of sizes) {
+    buildIcon(variant, "rl", background, color, size);
+  }
+}

@@ -1,12 +1,16 @@
 {
   "manifest_version": 2,
   "name": "readlater://",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "Save files to readlater:// using native host",
   "icons": {
-    "96": "icons/icon-gray-96.png",
+    "16": "icons/icon-gray-16.png",
+    "19": "icons/icon-gray-19.png",
+    "32": "icons/icon-gray-32.png",
+    "38": "icons/icon-gray-38.png",
     "48": "icons/icon-gray-48.png",
-    "24": "icons/icon-gray-24.png"
+    "64": "icons/icon-gray-64.png",
+    "128": "icons/icon-gray-128.png"
   },
   "permissions": [
     "activeTab",
@@ -14,8 +18,13 @@
   ],
   "browser_action": {
     "default_icon": {
+      "16": "icons/icon-gray-16.png",
       "19": "icons/icon-gray-19.png",
-      "38": "icons/icon-gray-38.png"
+      "32": "icons/icon-gray-32.png",
+      "38": "icons/icon-gray-38.png",
+      "48": "icons/icon-gray-48.png",
+      "64": "icons/icon-gray-64.png",
+      "128": "icons/icon-gray-128.png"
     },
     "default_title": "readlater://"
   },
