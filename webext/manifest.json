@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "readlater://",
-  "version": "1.5.2",
+  "version": "1.6.0",
   "description": "Save files to readlater:// using native host",
   "icons": {
     "16": "icons/icon-gray-16.png",
@@ -27,6 +27,14 @@
       "128": "icons/icon-gray-128.png"
     },
     "default_title": "readlater://"
+  },
+  "commands": {
+    "save-for-later": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+L"
+      },
+      "description": "Save for later"
+    }
   },
   "browser_specific_settings": {
     "gecko": {

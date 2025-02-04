@@ -54,9 +54,9 @@ javascript: (function () {
   - [x] Release the web extension
   - [x] Change toolbar icon based on result
   - [x] Firefox(on Linux) Support
+  - [x] Keyboard shortcut (`Ctrl+Shift+L`)
   - [ ] Insert `readlater://` links in web pages for easier saving to
         `readlater://`
-  - [ ] Keyboard shortcut
   - [ ] Support for Chrome and Chromium based browsers
 - CI
   - [x] Tests
