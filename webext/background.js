@@ -16,16 +16,13 @@ browser.browserAction.onClicked.addListener(async (tab) => {
     url,
     title,
   });
-  let defaultIconTimeout = 2000;
   if (res.status = "ok") {
     setIcon(successIcon);
+    setTimeout(() => {
+      // resset to default icon
+      setIcon(defaultIcon);
+    }, 3000);
   } else {
-    defaultIconTimeout = 5000;
     setIcon(errorIcon);
   }
-
-  setTimeout(() => {
-    // set default icon
-    setIcon(defaultIcon);
-  }, defaultIconTimeout);
 });
