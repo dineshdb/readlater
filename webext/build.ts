@@ -1,3 +1,5 @@
+#!/usr/bin/env -S pkgx deno@2 run -A
+
 import sharp from "npm:sharp";
 import { Buffer } from "node:buffer";
 
