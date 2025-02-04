@@ -47,14 +47,24 @@ javascript: (function () {
 ## Roadmap
 
 - Protocol Handler
+- Native Host and Protocol handler
+  - [x] Linux protocol handler for
+        `readlater://save?url=<url>&title=<title>&tags=<tags>`
   - [x] Save new urls to Pocket
+  - Save links to pocket even when offline
+    - [ ] Local cache of remote data
+    - [ ] Queue of save actions and background sync
+  - [ ] Tag imdb links as watchlater
+  - [ ] Tag archived imdb links as watched
+  - [ ] Tag youtube links as watchlater
 - WebExtension
-  - [x] Add a `readlater://` button that saves current tab to `readlater://` via
-        native extension
+  - [x] Add a `readlater://` button that saves current tab pocket
   - [x] Release the web extension
   - [x] Change toolbar icon based on result
   - [x] Firefox(on Linux) Support
   - [x] Keyboard shortcut (`Ctrl+Shift+L`)
+  - [ ] SideView with local cached data
+  - [ ] Add browser bookmarks to pocket with #bookmark tag
   - [ ] Insert `readlater://` links in web pages for easier saving to
         `readlater://`
   - [ ] Support for Chrome and Chromium based browsers
