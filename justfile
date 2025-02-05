@@ -20,6 +20,9 @@ check:
 	nice cargo check --workspace
 
 build:
+	cargo build
+
+webext-build:
 	cd webext; pkgx deno run -A build.ts
 	cd webext; pkgx npx -y web-ext build --overwrite-dest
 
