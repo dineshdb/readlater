@@ -11,3 +11,5 @@ reqwest.workspace = true
 url.workspace = true
 util = { path = "../util" }
 insta.workspace = true
+sqlx.workspace = true
+tokio.workspace = true
