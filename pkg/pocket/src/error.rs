@@ -12,6 +12,9 @@ pub enum PocketError {
     Proto(String, String, Option<String>),
     #[error("X-Error-Code is malformed UTF-8")]
     ReqwwestStrError(#[from] reqwest::header::ToStrError),
+
+    #[error("An unknown error occured")]
+    Unknown,
 }
 
 pub type PocketResult<T> = Result<T, PocketError>;

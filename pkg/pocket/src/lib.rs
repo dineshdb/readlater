@@ -3,7 +3,7 @@ mod item;
 pub mod modify;
 mod retrieve;
 
-use error::{PocketError, PocketResult};
+pub use error::{PocketError, PocketResult};
 use modify::{Action, AddUrlRequest, ModifyItem, PocketSendRequest};
 use reqwest::{
     header::{self, HeaderValue},

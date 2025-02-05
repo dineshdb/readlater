@@ -52,3 +52,10 @@ where
 {
     from_string(deserializer)
 }
+
+pub fn u64_from_string<'de, D>(deserializer: D) -> Result<u64, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    from_string(deserializer)
+}

@@ -1,8 +1,11 @@
 use serde::Deserialize;
+use serde::Serialize;
+use std::collections::HashMap;
 use util::der::bool_from_string;
 use util::der::i32_from_string;
+use util::der::u64_from_string;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct Item {
     pub item_id: String,
     pub resolved_id: String,
@@ -35,9 +38,17 @@ pub struct Item {
     pub time_to_read: i32,
     pub top_image_url: Option<String>,
     pub listen_duration_estimate: i32,
+    pub tags: HashMap<String, Tag>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize, Debug)]
+pub struct Tag {
+    pub tag: String,
+    #[serde(deserialize_with = "u64_from_string")]
+    pub item_id: u64,
+}
+
+#[derive(Deserialize, Debug)]
 #[repr(i32)]
 pub enum ItemStatus {
     #[serde(rename = "0")]
@@ -48,7 +59,7 @@ pub enum ItemStatus {
     Deleted = 2,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 #[repr(i32)]
 pub enum HasVideo {
     #[serde(rename = "0")]
@@ -59,7 +70,7 @@ pub enum HasVideo {
     IsVideo = 2,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 #[repr(i32)]
 pub enum HasImage {
     #[serde(rename = "0")]
