@@ -1,20 +1,9 @@
 CREATE TABLE [items] (
    [id] INTEGER PRIMARY KEY,
-   [given_url] TEXT,
-   [given_title] TEXT,
-   [favorite] INTEGER,
-   [status] INTEGER,
-   [time_added] INTEGER,
-   [time_updated] INTEGER,
-   [time_read] INTEGER,
-   [time_favorited] TEXT
-);
-
-CREATE TABLE [resolved_items] (
-   [id] INTEGER PRIMARY KEY,
-   [title] TEXT,
-   [url] TEXT,
+   [title] TEXT NOT NULL DEFAULT '',
+   [url] TEXT NOT NULL,
    [excerpt] TEXT,
+
    [is_article] INTEGER,
    [is_index] INTEGER,
    [has_video] INTEGER,
@@ -27,12 +16,19 @@ CREATE TABLE [resolved_items] (
    [time_to_read] INTEGER,
    [top_image_url] TEXT, 
    [domain_metadata] TEXT,
-   [videos] TEXT
+   [videos] TEXT,
+
+   [status] INTEGER,
+   [time_added] INTEGER,
+   [time_updated] INTEGER,
+   [time_read] INTEGER,
+   [time_favorited] INTEGER
 );
 
 CREATE TABLE [tags] (
 	[id] INTEGER PRIMARY KEY AUTOINCREMENT,
-	[tag] TEXT NOT NULL COLLATE NOCASE UNIQUE
+	[tag] TEXT NOT NULL COLLATE NOCASE UNIQUE,
+   [name] TEXT
 );
 
 CREATE TABLE [items_tags] (

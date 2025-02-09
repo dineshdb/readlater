@@ -23,7 +23,7 @@ enum Commands {
         #[clap(subcommand)]
         subcommand: PocketCommands,
     },
-    Register {},
+    Setup,
     Handle {
         #[arg(long)]
         url: Url,
@@ -31,15 +31,11 @@ enum Commands {
 }
 
 #[derive(Subcommand)]
-enum HandlerCommands {
-    Register,
-}
-
-#[derive(Subcommand)]
 enum PocketCommands {
     Get,
     Add { url: Url },
     Archive { items: Vec<u64> },
+    Sync,
 }
 
 #[tokio::main]
@@ -69,6 +65,7 @@ async fn main() {
                     let article = pocket.get(Default::default()).await.unwrap();
                     for (_, article) in article.list {
                         println!("{} {}", article.item_id, article.resolved_title);
+                        dbg!(&article);
                     }
                 }
                 PocketCommands::Add { url } => {
@@ -81,9 +78,26 @@ async fn main() {
                     }
                     pocket.archive(items).await.unwrap();
                 }
+                PocketCommands::Sync => {
+                    let pool = localdb::open_database("mydb.sqlite").await.unwrap();
+                    let article = pocket.get(Default::default()).await.unwrap();
+                    // let articles = article
+                    //     .list
+                    //     .values()
+                    //     .into_iter()
+                    //     .map(|i| localdb::item::Item::from(i))
+                    //     .collect::<Vec<_>>();
+                    let mut db = localdb::Database::new(pool).unwrap();
+                    let items = db.get_items().await.unwrap();
+
+                    dbg!(items);
+                    // for article in articles {
+                    //     println!("{} {}", article.id, article.title);
+                    // }
+                }
             }
         }
-        Commands::Register {} => {
+        Commands::Setup => {
             let cli = std::env::current_exe().unwrap();
             let cli = cli.to_str().to_owned().unwrap();
             readlater::proto_handler::register_url_handler();

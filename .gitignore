@@ -1,2 +1,6 @@
 /target
 *.zip
+*.db
+*.sqlite
+*.sqlite3
+*.env
