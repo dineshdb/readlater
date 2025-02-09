@@ -12,3 +12,4 @@ insta.workspace = true
 sqlx.workspace = true
 tokio.workspace = true
 pocket = { path = "../pocket" }
+itertools.workspace = true

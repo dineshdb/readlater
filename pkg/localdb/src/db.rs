@@ -1,6 +1,6 @@
-use sqlx::SqlitePool;
-
 use crate::item::{self, HasImage, HasVideo, ItemStatus};
+use itertools::Itertools;
+use sqlx::SqlitePool;
 
 pub async fn open_database(path: &str) -> crate::Result<SqlitePool> {
     let pool = SqlitePool::connect(path).await?;
@@ -13,7 +13,7 @@ pub struct Database {
 }
 
 #[derive(Debug, sqlx::FromRow)]
-pub struct ItemRow {
+struct ItemRow {
     pub id: i64,
     pub title: String,
     pub url: String,
@@ -36,6 +36,7 @@ pub struct ItemRow {
     pub time_updated: Option<i64>,
     pub time_read: Option<i64>,
     pub time_favorited: Option<i64>,
+    pub tag_id: Option<i64>,
     pub tag: Option<String>,
     pub tag_name: Option<String>,
 }
@@ -54,10 +55,11 @@ impl Database {
         Ok(())
     }
 
-    pub async fn get_items(&self) -> crate::Result<Vec<ItemRow>> {
-        let rows = sqlx::query_as(
+    pub async fn get_items(&self) -> crate::Result<Vec<item::Item>> {
+        let rows: Vec<ItemRow> = sqlx::query_as(
             r#"
-            SELECT items.*,
+            select items.*,
+                tags.id as tag_id,
                 tags.name as tag_name, tags.tag as tag
             from items 
             left join items_tags 
@@ -69,8 +71,38 @@ impl Database {
         .fetch_all(&self.pool)
         .await?;
 
-        // todo: group by item_id and add tags to vec of tags
-        // return item::Item
+        let rows = rows
+            .into_iter()
+            .into_grouping_map_by(|row| row.id)
+            .fold(item::Item::default(), |mut item, _, row| {
+                item.title = row.title;
+                item.url = row.url;
+                item.id = row.id;
+                item.excerpt = row.excerpt;
+                item.is_article = row.is_article;
+                item.is_index = row.is_index;
+                item.has_video = row.has_video;
+                item.has_image = row.has_image;
+                item.word_count = row.word_count;
+                item.lang = row.lang;
+                item.time_to_read = row.time_to_read;
+                item.top_image_url = row.top_image_url;
+                item.listen_duration_estimate = row.listen_duration_estimate;
+                item.time_added = row.time_added;
+                item.time_updated = row.time_updated;
+                item.time_read = row.time_read;
+                item.time_favorited = row.time_favorited;
+
+                item.status = row.status;
+                item.tags.insert(item::Tag {
+                    id: row.tag_id.unwrap_or_default(),
+                    tag: row.tag.unwrap_or_default(),
+                    name: row.tag_name,
+                });
+                item
+            })
+            .into_values()
+            .collect_vec();
 
         Ok(rows)
     }

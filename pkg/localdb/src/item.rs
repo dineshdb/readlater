@@ -1,7 +1,9 @@
+use std::collections::HashSet;
+
 use serde::Deserialize;
 use serde::Serialize;
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct Item {
     pub id: i64,
     pub title: String,
@@ -18,7 +20,7 @@ pub struct Item {
     pub time_to_read: Option<i32>,
     pub top_image_url: Option<String>,
     pub listen_duration_estimate: Option<i32>,
-    pub tags: Vec<Tag>,
+    pub tags: HashSet<Tag>,
 
     // fields related to the status of the url with respect to the user
     pub status: ItemStatus,
@@ -40,7 +42,7 @@ impl Default for Item {
             time_updated: None,
             time_read: None,
             time_favorited: None,
-            tags: Vec::new(),
+            tags: HashSet::new(),
 
             is_article: None,
             is_index: None,
@@ -55,14 +57,14 @@ impl Default for Item {
     }
 }
 
-#[derive(Deserialize, Serialize, Debug, sqlx::FromRow)]
+#[derive(Deserialize, Serialize, Debug, sqlx::FromRow, Clone, PartialEq, Eq, Hash)]
 pub struct Tag {
     pub id: i64,
     pub tag: String,
     pub name: Option<String>,
 }
 
-#[derive(Deserialize, Debug, sqlx::Type, PartialEq, Eq)]
+#[derive(Deserialize, Debug, sqlx::Type, PartialEq, Eq, Clone, Copy)]
 #[repr(i32)]
 pub enum ItemStatus {
     Unread = 0,
@@ -80,7 +82,7 @@ impl From<pocket::item::ItemStatus> for ItemStatus {
     }
 }
 
-#[derive(Deserialize, Debug, Clone, sqlx::Type)]
+#[derive(Deserialize, Debug, Clone, sqlx::Type, Copy)]
 #[repr(i32)]
 pub enum HasVideo {
     No = 0,
@@ -98,7 +100,7 @@ impl From<pocket::item::HasVideo> for HasVideo {
     }
 }
 
-#[derive(Deserialize, Debug, Clone, sqlx::Type)]
+#[derive(Deserialize, Debug, Clone, sqlx::Type, Copy)]
 #[repr(i32)]
 pub enum HasImage {
     No = 0,

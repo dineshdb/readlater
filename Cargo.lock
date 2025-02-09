@@ -1162,6 +1162,7 @@ name = "localdb"
 version = "0.1.0"
 dependencies = [
  "insta",
+ "itertools",
  "pocket",
  "serde",
  "sqlx",
@@ -1603,7 +1604,6 @@ dependencies = [
  "clap",
  "dirs",
  "figment",
- "itertools",
  "localdb",
  "native_messaging",
  "open",
