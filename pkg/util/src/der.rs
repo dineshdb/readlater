@@ -46,16 +46,14 @@ where
     value.parse::<T>().map_err(de::Error::custom)
 }
 
-pub fn i32_from_string<'de, D>(deserializer: D) -> Result<i32, D::Error>
+pub fn opt_from_string<'de, D, T: FromStr>(deserializer: D) -> Result<Option<T>, D::Error>
 where
     D: Deserializer<'de>,
+    T::Err: std::fmt::Display,
 {
-    from_string(deserializer)
-}
-
-pub fn u64_from_string<'de, D>(deserializer: D) -> Result<u64, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    from_string(deserializer)
+    let v = from_string(deserializer);
+    match v {
+        Ok(v) => Ok(Some(v)),
+        Err(_) => Ok(None),
+    }
 }

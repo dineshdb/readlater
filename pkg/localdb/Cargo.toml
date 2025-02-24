@@ -1,0 +1,15 @@
+[package]
+name = "localdb"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+thiserror.workspace = true
+serde.workspace = true
+url.workspace = true
+util = { path = "../util" }
+insta.workspace = true
+sqlx.workspace = true
+tokio.workspace = true
+pocket = { path = "../pocket" }
+itertools.workspace = true

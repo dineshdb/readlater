@@ -7,7 +7,10 @@ review:
 fmt:
 	cargo fmt --all
 
-install:
+br:
+	cargo build --release
+
+install: br
 	cargo install --path . --force
 	readlater register
 

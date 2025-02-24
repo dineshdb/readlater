@@ -1,16 +1,18 @@
 mod error;
-mod item;
+pub mod item;
 pub mod modify;
-mod retrieve;
+pub mod retrieve;
 
-pub use error::{PocketError, PocketResult};
 use modify::{Action, AddUrlRequest, ModifyItem, PocketSendRequest};
 use reqwest::{
     header::{self, HeaderValue},
     Client, Response,
 };
-use retrieve::{GetOptions, RetrieveResponse};
 use serde::Serialize;
+
+pub use error::{PocketError, PocketResult};
+pub use item::Item;
+pub use retrieve::*;
 
 const X_ACCEPT: &str = "X-Accept";
 const X_ERROR: &str = "X-Error";

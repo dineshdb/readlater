@@ -52,7 +52,7 @@ javascript: (function () {
         `readlater://save?url=<url>&title=<title>&tags=<tags>`
   - [x] Save new urls to Pocket
   - Save links to pocket even when offline
-    - [ ] Local cache of remote data
+    - [x] Local cache of remote data
     - [ ] Queue of save actions and background sync
   - [ ] Tag imdb links as watchlater
   - [ ] Tag archived imdb links as watched

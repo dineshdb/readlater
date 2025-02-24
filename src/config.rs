@@ -1,3 +1,4 @@
+use directories::ProjectDirs;
 use serde::Deserialize;
 
 use figment::{
@@ -11,11 +12,17 @@ pub struct Config {
     pub pocket_access_token: String,
 }
 
+pub fn get_dirs() -> ProjectDirs {
+    ProjectDirs::from("", "", "readlater").expect("Could not find project directory")
+}
+
 pub fn get_config() -> anyhow::Result<Config> {
-    let config_dir = dirs::config_dir().expect("Could not find config directory");
-    let base_dir = config_dir.join("readlater");
-    std::fs::create_dir_all(&base_dir)?;
-    let config_file = base_dir.join("config.toml");
+    let project_dirs = get_dirs();
+    let config_dir = project_dirs.config_dir();
+    std::fs::create_dir_all(project_dirs.config_local_dir())?;
+    std::fs::create_dir_all(project_dirs.data_local_dir())?;
+
+    let config_file = config_dir.join("config.toml");
     let config: Config = Figment::new()
         .merge(Toml::file(config_file))
         .merge(Env::prefixed("READLATER_"))

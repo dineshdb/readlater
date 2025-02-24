@@ -13,6 +13,12 @@ pub enum PocketError {
     #[error("X-Error-Code is malformed UTF-8")]
     ReqwwestStrError(#[from] reqwest::header::ToStrError),
 
+    #[error("total should be included for pagination")]
+    InvalidPagintionRequest,
+
+    #[error("parse error")]
+    ParseError,
+
     #[error("An unknown error occured")]
     Unknown,
 }

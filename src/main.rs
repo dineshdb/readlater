@@ -1,9 +1,10 @@
 use std::{collections::HashMap, path::PathBuf};
 
 use clap::{Parser, Subcommand};
-use pocket::{modify::AddUrlRequest, PocketClient};
+use localdb::KvDB;
+use pocket::{modify::AddUrlRequest, GetOptions, PocketClient};
 use readlater::{
-    config::get_config,
+    config::{get_config, get_dirs},
     native_host::{
         install::{install_linux, Manifest},
         native_host_handler,
@@ -23,7 +24,7 @@ enum Commands {
         #[clap(subcommand)]
         subcommand: PocketCommands,
     },
-    Register {},
+    Setup,
     Handle {
         #[arg(long)]
         url: Url,
@@ -31,21 +32,18 @@ enum Commands {
 }
 
 #[derive(Subcommand)]
-enum HandlerCommands {
-    Register,
-}
-
-#[derive(Subcommand)]
 enum PocketCommands {
     Get,
     Add { url: Url },
     Archive { items: Vec<u64> },
+    Sync,
 }
+
+const DATABASE_PATH: &str = "readlater.sqlite";
 
 #[tokio::main]
 async fn main() {
     let config = get_config().expect("error loading config");
-
     let args: Vec<String> = std::env::args().collect();
 
     // todo: proper handling so that we don't have to do this
@@ -69,6 +67,7 @@ async fn main() {
                     let article = pocket.get(Default::default()).await.unwrap();
                     for (_, article) in article.list {
                         println!("{} {}", article.item_id, article.resolved_title);
+                        dbg!(&article);
                     }
                 }
                 PocketCommands::Add { url } => {
@@ -81,9 +80,67 @@ async fn main() {
                     }
                     pocket.archive(items).await.unwrap();
                 }
+                PocketCommands::Sync => {
+                    let dirs = get_dirs();
+                    let pool = localdb::open_database(
+                        dirs.data_local_dir().join(DATABASE_PATH).to_str().unwrap(),
+                    )
+                    .await
+                    .unwrap();
+                    let mut db = localdb::LocalDb::new(pool.clone()).unwrap();
+                    let mut kv_db = KvDB::new(pool.clone());
+                    let since = kv_db
+                        .get_kv::<i32>("pocket_since")
+                        .await
+                        .map(|k| k.value)
+                        .unwrap_or(0);
+
+                    let mut offset = kv_db
+                        .get_kv::<i32>("pocket_offset")
+                        .await
+                        .map(|k| k.value)
+                        .unwrap_or(0);
+
+                    loop {
+                        let response = pocket
+                            .get(GetOptions {
+                                since: Some(since),
+                                offset: Some(offset),
+                                count: 30,
+                                ..GetOptions::for_pagination()
+                            })
+                            .await
+                            .unwrap();
+
+                        offset += 30;
+                        kv_db
+                            .set_kv(&("pocket_offset", offset).into())
+                            .await
+                            .unwrap();
+
+                        for article in response.list.values() {
+                            let article: localdb::Item = article.into();
+                            db.add(&article).await.unwrap();
+                            println!("{} {}", article.id, article.title);
+                        }
+
+                        let has_more = response.has_more().expect("invalid request");
+                        if response.list.is_empty() || !has_more {
+                            println!("Since {}", response.since);
+                            kv_db
+                                .set_kv(
+                                    &("pocket_since".to_string(), response.since.to_string())
+                                        .into(),
+                                )
+                                .await
+                                .unwrap();
+                            break;
+                        }
+                    }
+                }
             }
         }
-        Commands::Register {} => {
+        Commands::Setup => {
             let cli = std::env::current_exe().unwrap();
             let cli = cli.to_str().to_owned().unwrap();
             readlater::proto_handler::register_url_handler();
@@ -129,5 +186,5 @@ async fn main() {
                 .await
                 .unwrap();
         }
-    }
+    };
 }
