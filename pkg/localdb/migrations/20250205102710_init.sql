@@ -31,8 +31,9 @@ CREATE TABLE [tags] (
 );
 
 CREATE TABLE [items_tags] (
-	[item_id] INTEGER REFERENCES items(id),
-	[tag_id] INTEGER REFERENCES tags(id)
+	[item_id] INTEGER NOT NULL REFERENCES items(id),
+	[tag_id] INTEGER NOT NULL REFERENCES tags(id),
+   PRIMARY KEY (tag_id, item_id)
 );
 
 CREATE TABLE [authors] (

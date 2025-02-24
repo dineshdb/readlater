@@ -21,6 +21,7 @@ pub fn get_config() -> anyhow::Result<Config> {
     let config_dir = project_dirs.config_dir();
     std::fs::create_dir_all(project_dirs.config_local_dir())?;
     std::fs::create_dir_all(project_dirs.data_local_dir())?;
+    std::fs::File::open(project_dirs.data_local_dir().join("readlater.sqlite"))?;
 
     let config_file = config_dir.join("config.toml");
     let config: Config = Figment::new()

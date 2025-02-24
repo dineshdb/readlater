@@ -9,7 +9,7 @@ pub enum PocketError {
     #[error("Request error for URL <{url}>: {source}")]
     Reqwest { url: String, source: reqwest::Error },
     #[error("Pocket protocol error: {1} ({0})")]
-    Proto(String, String, Option<String>),
+    Proto(i32, String, Option<String>),
     #[error("X-Error-Code is malformed UTF-8")]
     ReqwwestStrError(#[from] reqwest::header::ToStrError),
 

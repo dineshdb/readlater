@@ -71,7 +71,12 @@ impl<'a> PocketClient<'a> {
             })?;
 
         if let Some(code) = res.headers().get(X_ERROR_CODE) {
-            let code = code.to_str().expect("X-Error-Code is malformed").into();
+            let code = code
+                .to_str()
+                .expect("X-Error-Code is malformed")
+                .parse()
+                .expect("X-Error-Code is malformed integer");
+
             return Err(PocketError::Proto(
                 code,
                 res.headers()

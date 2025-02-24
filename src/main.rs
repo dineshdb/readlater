@@ -1,5 +1,4 @@
-use std::{collections::HashMap, path::PathBuf};
-
+use chrono::DateTime;
 use clap::{Parser, Subcommand};
 use localdb::KvDB;
 use pocket::{modify::AddUrlRequest, GetOptions, PocketClient};
@@ -10,6 +9,7 @@ use readlater::{
         native_host_handler,
     },
 };
+use std::{collections::HashMap, path::PathBuf};
 use url::Url;
 #[derive(Parser)]
 #[command(author, version, about)]
@@ -87,19 +87,29 @@ async fn main() {
                     )
                     .await
                     .unwrap();
-                    let mut db = localdb::LocalDb::new(pool.clone()).unwrap();
+                    let mut db = localdb::LocalDb::new(pool.clone());
                     let mut kv_db = KvDB::new(pool.clone());
                     let since = kv_db
                         .get_kv::<i32>("pocket_since")
                         .await
                         .map(|k| k.value)
-                        .unwrap_or(0);
+                        .ok();
 
-                    let mut offset = kv_db
+                    let offset = kv_db
                         .get_kv::<i32>("pocket_offset")
                         .await
                         .map(|k| k.value)
-                        .unwrap_or(0);
+                        .ok();
+
+                    let (since, mut offset) = match (since, offset) {
+                        (Some(since), _) => (since, 0),
+                        (_, Some(offset)) => (0, offset),
+                        _ => (0, 0),
+                    };
+
+                    let datetime =
+                        DateTime::from_timestamp(since as i64, 0).expect("unexpected date time");
+                    println!("Syncing data since {} with offset {}", datetime, offset);
 
                     loop {
                         let response = pocket
@@ -112,21 +122,20 @@ async fn main() {
                             .await
                             .unwrap();
 
-                        offset += 30;
-                        kv_db
-                            .set_kv(&("pocket_offset", offset).into())
-                            .await
-                            .unwrap();
-
                         for article in response.list.values() {
                             let article: localdb::Item = article.into();
                             db.add(&article).await.unwrap();
                             println!("{} {}", article.id, article.title);
                         }
 
+                        offset += 30;
+                        kv_db
+                            .set_kv(&("pocket_offset", offset).into())
+                            .await
+                            .unwrap();
+
                         let has_more = response.has_more().expect("invalid request");
                         if response.list.is_empty() || !has_more {
-                            println!("Since {}", response.since);
                             kv_db
                                 .set_kv(
                                     &("pocket_since".to_string(), response.since.to_string())
