@@ -80,7 +80,6 @@ impl Default for Item {
             time_read: None,
             time_favorited: None,
             tags: HashSet::new(),
-
             is_article: None,
             is_index: None,
             has_video: None,
@@ -99,6 +98,16 @@ pub struct Tag {
     pub id: i32,
     pub tag: String,
     pub name: Option<String>,
+}
+
+impl Default for Tag {
+    fn default() -> Self {
+        Tag {
+            id: 0,
+            tag: "example".to_string(),
+            name: Some("Example Tag".to_string()),
+        }
+    }
 }
 
 #[derive(Deserialize, Debug, sqlx::Type, PartialEq, Eq, Clone, Copy)]

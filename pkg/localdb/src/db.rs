@@ -42,12 +42,41 @@ struct ItemRow {
 }
 
 impl LocalDb {
-    pub fn new(pool: SqlitePool) -> crate::Result<Self> {
-        Ok(Self { pool })
+    pub fn new(pool: SqlitePool) -> Self {
+        Self { pool }
     }
 
-    pub async fn add(&mut self, item: &item::Item) -> crate::Result<()> {
+    pub async fn add_tag(&mut self, tag: &item::Tag) -> crate::Result<i32> {
+        let res = sqlx::query(
+            "INSERT INTO tags (name, tag) VALUES (?, ?) ON CONFLICT(tag) DO NOTHING RETURNING id",
+        )
+        .bind(&tag.name)
+        .bind(&tag.tag)
+        .execute(&self.pool)
+        .await?;
+        Ok(res.last_insert_rowid() as i32)
+    }
+
+    pub async fn get_tags(&mut self) -> crate::Result<Vec<item::Tag>> {
+        let res: Vec<item::Tag> = sqlx::query_as("SELECT id, tag, name FROM tags")
+            .fetch_all(&self.pool)
+            .await?;
+        Ok(res)
+    }
+
+    pub async fn link_tag(&mut self, tag: i32, item: i32) -> crate::Result<()> {
         sqlx::query(
+            "INSERT INTO items_tags (item_id, tag_id) VALUES (?, ?) ON CONFLICT(item_id, tag_id) DO NOTHING",
+        )
+        .bind(item)
+        .bind(tag)
+        .execute(&self.pool)
+        .await?;
+        Ok(())
+    }
+
+    pub async fn add(&mut self, item: &item::Item) -> crate::Result<i32> {
+        let resutl = sqlx::query(
             "INSERT INTO items (
             pocket_id, 
             title, 
@@ -97,7 +126,16 @@ impl LocalDb {
         .bind(item.time_favorited)
         .execute(&self.pool)
         .await?;
-        Ok(())
+
+        let tem_id = resutl.last_insert_rowid() as i32;
+
+        let tags = item.tags.iter().collect_vec();
+        for tag in tags {
+            let tag_id = self.add_tag(tag).await?;
+            self.link_tag(tag_id, tem_id).await?;
+        }
+
+        Ok(tem_id as i32)
     }
 
     pub async fn get_items(&self) -> crate::Result<Vec<item::Item>> {
@@ -155,9 +193,18 @@ impl LocalDb {
 
 #[cfg(test)]
 mod test {
-    use crate::item::ItemStatus;
+    use std::collections::HashSet;
 
     use super::*;
+    use crate::{
+        item::{ItemStatus, Tag},
+        Item,
+    };
+
+    async fn get_db() -> LocalDb {
+        let pool = open_database(":memory:").await.unwrap();
+        LocalDb::new(pool)
+    }
 
     #[tokio::test]
     async fn test_open_in_memory() {
@@ -167,23 +214,68 @@ mod test {
 
     #[tokio::test]
     async fn test_get_items() {
-        let pool = open_database(":memory:").await.unwrap();
-        let db = LocalDb::new(pool).unwrap();
+        let db = get_db().await;
         let items = db.get_items().await.unwrap();
         assert!(items.is_empty());
     }
 
     #[tokio::test]
     async fn test_add_item() {
-        let pool = open_database(":memory:").await.unwrap();
-        let mut db = LocalDb::new(pool).unwrap();
-        let item = Default::default();
+        let mut db = get_db().await;
+
+        let tag = Tag {
+            id: 0,
+            tag: "tag".to_string(),
+            name: None,
+        };
+
+        let item = Item {
+            tags: HashSet::from([Tag::default(), tag]),
+            ..Default::default()
+        };
+
         db.add(&item).await.unwrap();
+
         let items = db.get_items().await.unwrap();
         assert_eq!(items.len(), 1);
         assert_eq!(items[0].title, item.title);
         assert_eq!(items[0].url, item.url);
         assert_eq!(items[0].id, 1);
         assert_eq!(items[0].status, ItemStatus::Unread);
+
+        assert_eq!(items[0].tags.len(), 2);
+        assert!(items[0].tags.iter().any(|t| t.tag == "tag"));
+        assert!(items[0].tags.iter().any(|t| t.tag == "example"));
+    }
+
+    #[tokio::test]
+    async fn test_add_tag() {
+        let mut db = get_db().await;
+        let result = db.add_tag(&Default::default()).await;
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), 1);
+    }
+
+    #[tokio::test]
+    async fn test_add_duplicate_tag() {
+        let mut db = get_db().await;
+        db.add_tag(&Default::default())
+            .await
+            .expect("add_tag failed");
+        db.add_tag(&Default::default())
+            .await
+            .expect("add tag failed");
+
+        let tags = db.get_tags().await.unwrap();
+        assert_eq!(tags.len(), 1);
+    }
+
+    #[tokio::test]
+    async fn test_link_tag() {
+        let mut db = get_db().await;
+        let tag_id = db.add_tag(&Tag::default()).await.unwrap();
+        let item_id = db.add(&Default::default()).await.unwrap();
+        let res = db.link_tag(tag_id, item_id).await;
+        assert!(res.is_ok());
     }
 }
