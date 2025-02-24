@@ -4,7 +4,7 @@ use clap::{Parser, Subcommand};
 use localdb::KvDB;
 use pocket::{modify::AddUrlRequest, GetOptions, PocketClient};
 use readlater::{
-    config::get_config,
+    config::{get_config, get_dirs},
     native_host::{
         install::{install_linux, Manifest},
         native_host_handler,
@@ -81,7 +81,12 @@ async fn main() {
                     pocket.archive(items).await.unwrap();
                 }
                 PocketCommands::Sync => {
-                    let pool = localdb::open_database(DATABASE_PATH).await.unwrap();
+                    let dirs = get_dirs();
+                    let pool = localdb::open_database(
+                        dirs.data_local_dir().join(DATABASE_PATH).to_str().unwrap(),
+                    )
+                    .await
+                    .unwrap();
                     let mut db = localdb::LocalDb::new(pool.clone()).unwrap();
                     let mut kv_db = KvDB::new(pool.clone());
                     let since = kv_db
