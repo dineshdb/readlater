@@ -1,7 +1,8 @@
 use std::{collections::HashMap, path::PathBuf};
 
 use clap::{Parser, Subcommand};
-use pocket::{modify::AddUrlRequest, PocketClient};
+use localdb::KvDB;
+use pocket::{modify::AddUrlRequest, GetOptions, PocketClient};
 use readlater::{
     config::get_config,
     native_host::{
@@ -38,10 +39,11 @@ enum PocketCommands {
     Sync,
 }
 
+const DATABASE_PATH: &str = "readlater.sqlite";
+
 #[tokio::main]
 async fn main() {
     let config = get_config().expect("error loading config");
-
     let args: Vec<String> = std::env::args().collect();
 
     // todo: proper handling so that we don't have to do this
@@ -79,21 +81,57 @@ async fn main() {
                     pocket.archive(items).await.unwrap();
                 }
                 PocketCommands::Sync => {
-                    let pool = localdb::open_database("mydb.sqlite").await.unwrap();
-                    let article = pocket.get(Default::default()).await.unwrap();
-                    // let articles = article
-                    //     .list
-                    //     .values()
-                    //     .into_iter()
-                    //     .map(|i| localdb::item::Item::from(i))
-                    //     .collect::<Vec<_>>();
-                    let mut db = localdb::Database::new(pool).unwrap();
-                    let items = db.get_items().await.unwrap();
+                    let pool = localdb::open_database(DATABASE_PATH).await.unwrap();
+                    let mut db = localdb::LocalDb::new(pool.clone()).unwrap();
+                    let mut kv_db = KvDB::new(pool.clone());
+                    let since = kv_db
+                        .get_kv::<i32>("pocket_since")
+                        .await
+                        .map(|k| k.value)
+                        .unwrap_or(0);
 
-                    dbg!(items);
-                    // for article in articles {
-                    //     println!("{} {}", article.id, article.title);
-                    // }
+                    let mut offset = kv_db
+                        .get_kv::<i32>("pocket_offset")
+                        .await
+                        .map(|k| k.value)
+                        .unwrap_or(0);
+
+                    loop {
+                        let response = pocket
+                            .get(GetOptions {
+                                since: Some(since),
+                                offset: Some(offset),
+                                count: 30,
+                                ..GetOptions::for_pagination()
+                            })
+                            .await
+                            .unwrap();
+
+                        offset += 30;
+                        kv_db
+                            .set_kv(&("pocket_offset", offset).into())
+                            .await
+                            .unwrap();
+
+                        for article in response.list.values() {
+                            let article: localdb::Item = article.into();
+                            db.add(&article).await.unwrap();
+                            println!("{} {}", article.id, article.title);
+                        }
+
+                        let has_more = response.has_more().expect("invalid request");
+                        if response.list.is_empty() || !has_more {
+                            println!("Since {}", response.since);
+                            kv_db
+                                .set_kv(
+                                    &("pocket_since".to_string(), response.since.to_string())
+                                        .into(),
+                                )
+                                .await
+                                .unwrap();
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -143,5 +181,5 @@ async fn main() {
                 .await
                 .unwrap();
         }
-    }
+    };
 }

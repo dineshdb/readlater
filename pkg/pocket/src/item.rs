@@ -49,7 +49,7 @@ pub struct Tag {
     pub item_id: u64,
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Deserialize, Debug, Clone, Copy)]
 #[repr(i32)]
 pub enum ItemStatus {
     #[serde(rename = "0")]
@@ -60,7 +60,7 @@ pub enum ItemStatus {
     Deleted = 2,
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Deserialize, Debug, Clone, Copy)]
 #[repr(i32)]
 pub enum HasVideo {
     #[serde(rename = "0")]
@@ -71,7 +71,7 @@ pub enum HasVideo {
     IsVideo = 2,
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Deserialize, Debug, Clone, Copy)]
 #[repr(i32)]
 pub enum HasImage {
     #[serde(rename = "0")]

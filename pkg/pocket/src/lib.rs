@@ -1,7 +1,7 @@
 mod error;
 pub mod item;
 pub mod modify;
-mod retrieve;
+pub mod retrieve;
 
 use modify::{Action, AddUrlRequest, ModifyItem, PocketSendRequest};
 use reqwest::{
@@ -11,6 +11,7 @@ use reqwest::{
 use serde::Serialize;
 
 pub use error::{PocketError, PocketResult};
+pub use item::Item;
 pub use retrieve::*;
 
 const X_ACCEPT: &str = "X-Accept";

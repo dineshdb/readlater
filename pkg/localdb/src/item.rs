@@ -6,6 +6,7 @@ use serde::Serialize;
 #[derive(Deserialize, Debug, Clone)]
 pub struct Item {
     pub id: i64,
+    pub pocket_id: Option<i64>,
     pub title: String,
     pub url: String,
     pub excerpt: Option<String>,
@@ -24,16 +25,52 @@ pub struct Item {
 
     // fields related to the status of the url with respect to the user
     pub status: ItemStatus,
-    pub time_added: i64,
-    pub time_updated: Option<i64>,
-    pub time_read: Option<i64>,
-    pub time_favorited: Option<i64>,
+    pub time_added: i32,
+    pub time_updated: Option<i32>,
+    pub time_read: Option<i32>,
+    pub time_favorited: Option<i32>,
+}
+
+impl From<&pocket::Item> for Item {
+    fn from(value: &pocket::Item) -> Self {
+        Self {
+            id: value.item_id,
+            pocket_id: Some(value.item_id),
+            title: value.resolved_title.clone(),
+            url: value.resolved_url.clone(),
+            excerpt: Some(value.excerpt.clone()),
+            is_article: Some(value.is_article),
+            is_index: Some(value.is_article),
+            has_video: Some(value.has_video.into()),
+            has_image: Some(value.has_image.into()),
+            word_count: Some(value.word_count),
+            lang: Some(value.lang.clone()),
+            time_to_read: Some(value.time_to_read),
+            top_image_url: value.top_image_url.clone(),
+            listen_duration_estimate: Some(value.listen_duration_estimate),
+            tags: value
+                .tags
+                .keys()
+                .map(|tag| Tag {
+                    id: 0,
+                    tag: tag.clone(),
+                    name: None,
+                })
+                .collect(),
+            status: value.status.into(),
+            time_added: value.time_added,
+            time_updated: Some(value.time_updated),
+            time_read: Some(value.time_read),
+            time_favorited: Some(value.time_favorited),
+        }
+    }
 }
 
 impl Default for Item {
     fn default() -> Self {
         Item {
             id: 0,
+            pocket_id: None,
             title: "Example URL".to_string(),
             url: "http://example.com".to_string(),
             excerpt: None,
@@ -59,7 +96,7 @@ impl Default for Item {
 
 #[derive(Deserialize, Serialize, Debug, sqlx::FromRow, Clone, PartialEq, Eq, Hash)]
 pub struct Tag {
-    pub id: i64,
+    pub id: i32,
     pub tag: String,
     pub name: Option<String>,
 }
@@ -82,6 +119,15 @@ impl From<pocket::item::ItemStatus> for ItemStatus {
     }
 }
 
+impl From<ItemStatus> for pocket::item::ItemStatus {
+    fn from(status: ItemStatus) -> Self {
+        match status {
+            ItemStatus::Unread => pocket::item::ItemStatus::Unread,
+            ItemStatus::Archived => pocket::item::ItemStatus::Archived,
+            ItemStatus::Deleted => pocket::item::ItemStatus::Deleted,
+        }
+    }
+}
 #[derive(Deserialize, Debug, Clone, sqlx::Type, Copy)]
 #[repr(i32)]
 pub enum HasVideo {
@@ -96,6 +142,16 @@ impl From<pocket::item::HasVideo> for HasVideo {
             pocket::item::HasVideo::No => HasVideo::No,
             pocket::item::HasVideo::Yes => HasVideo::Yes,
             pocket::item::HasVideo::IsVideo => HasVideo::IsVideo,
+        }
+    }
+}
+
+impl From<HasVideo> for pocket::item::HasVideo {
+    fn from(has_video: HasVideo) -> Self {
+        match has_video {
+            HasVideo::No => pocket::item::HasVideo::No,
+            HasVideo::Yes => pocket::item::HasVideo::Yes,
+            HasVideo::IsVideo => pocket::item::HasVideo::IsVideo,
         }
     }
 }

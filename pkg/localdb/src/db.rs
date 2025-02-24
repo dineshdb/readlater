@@ -8,7 +8,7 @@ pub async fn open_database(path: &str) -> crate::Result<SqlitePool> {
     Ok(pool)
 }
 
-pub struct Database {
+pub struct LocalDb {
     pool: SqlitePool,
 }
 
@@ -32,26 +32,71 @@ struct ItemRow {
 
     // fields related to the status of the url with respect to the user
     pub status: ItemStatus,
-    pub time_added: i64,
-    pub time_updated: Option<i64>,
-    pub time_read: Option<i64>,
-    pub time_favorited: Option<i64>,
-    pub tag_id: Option<i64>,
+    pub time_added: i32,
+    pub time_updated: Option<i32>,
+    pub time_read: Option<i32>,
+    pub time_favorited: Option<i32>,
+    pub tag_id: Option<i32>,
     pub tag: Option<String>,
     pub tag_name: Option<String>,
 }
 
-impl Database {
+impl LocalDb {
     pub fn new(pool: SqlitePool) -> crate::Result<Self> {
         Ok(Self { pool })
     }
 
-    pub async fn add(&mut self, items: &item::Item) -> crate::Result<()> {
-        sqlx::query("INSERT INTO items (title, url) VALUES (?, ?)")
-            .bind(&items.title)
-            .bind(&items.url)
-            .execute(&self.pool)
-            .await?;
+    pub async fn add(&mut self, item: &item::Item) -> crate::Result<()> {
+        sqlx::query(
+            "INSERT INTO items (
+            pocket_id, 
+            title, 
+            url, 
+            excerpt, 
+            is_article, 
+            is_index, 
+            has_video, 
+            word_count, 
+            lang, 
+            listen_duration_estimate,
+            time_to_read,
+            top_image_url,
+            status,
+            time_added,            
+            time_updated,
+            time_read,
+            time_favorited
+        ) VALUES (
+            ?, ?, ?, ?, ?, ?,
+            ?, ?, ?, ?, ?, ?,
+            ?, ?, ?, ?, ?
+        ) ON CONFLICT(pocket_id) DO UPDATE SET
+            status = excluded.status,
+            time_added = excluded.time_added,
+            time_updated = excluded.time_updated,
+            time_read = excluded.time_read,
+            time_favorited = excluded.time_favorited
+         ",
+        )
+        .bind(item.pocket_id)
+        .bind(&item.title)
+        .bind(&item.url)
+        .bind(&item.excerpt)
+        .bind(item.is_article)
+        .bind(item.is_index)
+        .bind(item.has_video)
+        .bind(item.word_count)
+        .bind(&item.lang)
+        .bind(item.listen_duration_estimate)
+        .bind(item.time_to_read)
+        .bind(&item.top_image_url)
+        .bind(item.status)
+        .bind(item.time_added)
+        .bind(item.time_updated)
+        .bind(item.time_read)
+        .bind(item.time_favorited)
+        .execute(&self.pool)
+        .await?;
         Ok(())
     }
 
@@ -123,7 +168,7 @@ mod test {
     #[tokio::test]
     async fn test_get_items() {
         let pool = open_database(":memory:").await.unwrap();
-        let db = Database::new(pool).unwrap();
+        let db = LocalDb::new(pool).unwrap();
         let items = db.get_items().await.unwrap();
         assert!(items.is_empty());
     }
@@ -131,7 +176,7 @@ mod test {
     #[tokio::test]
     async fn test_add_item() {
         let pool = open_database(":memory:").await.unwrap();
-        let mut db = Database::new(pool).unwrap();
+        let mut db = LocalDb::new(pool).unwrap();
         let item = Default::default();
         db.add(&item).await.unwrap();
         let items = db.get_items().await.unwrap();

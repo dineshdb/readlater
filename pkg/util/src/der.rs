@@ -45,3 +45,15 @@ where
     let value: &str = Deserialize::deserialize(deserializer)?;
     value.parse::<T>().map_err(de::Error::custom)
 }
+
+pub fn opt_from_string<'de, D, T: FromStr>(deserializer: D) -> Result<Option<T>, D::Error>
+where
+    D: Deserializer<'de>,
+    T::Err: std::fmt::Display,
+{
+    let v = from_string(deserializer);
+    match v {
+        Ok(v) => Ok(Some(v)),
+        Err(_) => Ok(None),
+    }
+}
