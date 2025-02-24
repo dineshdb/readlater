@@ -16,6 +16,9 @@ pub enum PocketError {
     #[error("total should be included for pagination")]
     InvalidPagintionRequest,
 
+    #[error("auth error")]
+    Auth,
+
     #[error("parse error")]
     ParseError,
 

@@ -1,9 +1,9 @@
 pub mod install;
 
+use crate::config::Config;
+use localdb::KvDB;
 use native_messaging::host::{get_message, send_message};
 use pocket::{modify::AddUrlRequest, PocketClient};
-
-use crate::config::Config;
 
 #[derive(serde::Deserialize)]
 struct Message {
@@ -41,7 +41,12 @@ impl Result {
 }
 
 pub async fn native_host_handler(config: Config) {
-    let mut pocket = PocketClient::new(&config.pocket_consumer_key, &config.pocket_access_token);
+    let pool = localdb::open_database(config.database_dir.to_str().unwrap())
+        .await
+        .unwrap();
+    let kv_db = KvDB::new(pool.clone());
+    let access_token = kv_db.get_kv::<String>("pocket_access_token").await.unwrap();
+    let mut pocket = PocketClient::new(&config.pocket_consumer_key, &access_token.value);
 
     match get_message().await {
         Ok(message) => {

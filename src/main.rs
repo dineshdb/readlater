@@ -1,9 +1,9 @@
 use chrono::DateTime;
 use clap::{Parser, Subcommand};
-use localdb::KvDB;
+use localdb::KvConfig;
 use pocket::{modify::AddUrlRequest, GetOptions, PocketClient};
 use readlater::{
-    config::{get_config, get_dirs},
+    config::Config,
     native_host::{
         install::{install_linux, Manifest},
         native_host_handler,
@@ -11,6 +11,7 @@ use readlater::{
 };
 use std::{collections::HashMap, path::PathBuf};
 use url::Url;
+
 #[derive(Parser)]
 #[command(author, version, about)]
 struct Args {
@@ -36,14 +37,13 @@ enum PocketCommands {
     Get,
     Add { url: Url },
     Archive { items: Vec<u64> },
+    Auth,
     Sync,
 }
 
-const DATABASE_PATH: &str = "readlater.sqlite";
-
 #[tokio::main]
 async fn main() {
-    let config = get_config().expect("error loading config");
+    let config: Config = Config::new().expect("error loading config");
     let args: Vec<String> = std::env::args().collect();
 
     // todo: proper handling so that we don't have to do this
@@ -56,14 +56,21 @@ async fn main() {
         return;
     }
 
+    let pool = localdb::open_database(config.database_dir.to_str().unwrap())
+        .await
+        .unwrap();
+    let mut kv_config = KvConfig::new(pool.clone());
+
     let args = Args::parse();
     match args.command {
         Commands::Pocket { subcommand } => {
-            let mut pocket =
-                PocketClient::new(&config.pocket_consumer_key, &config.pocket_access_token);
+            let access_token = kv_config.get_pocket_access_token().await;
 
             match subcommand {
                 PocketCommands::Get => {
+                    let access_token = access_token.expect("no access token available");
+                    let mut pocket = PocketClient::new(&config.pocket_consumer_key, &access_token);
+
                     let article = pocket.get(Default::default()).await.unwrap();
                     for (_, article) in article.list {
                         println!("{} {}", article.item_id, article.resolved_title);
@@ -71,35 +78,49 @@ async fn main() {
                     }
                 }
                 PocketCommands::Add { url } => {
+                    let access_token = access_token.expect("no access token available");
+                    let mut pocket = PocketClient::new(&config.pocket_consumer_key, &access_token);
                     pocket.add(vec![AddUrlRequest::new(url)]).await.unwrap();
+                }
+                PocketCommands::Auth => {
+                    let redirect_uri = "https://localhost:3000".to_string();
+                    let auth_client = pocket::auth::PocketAuthClient::new(
+                        config.pocket_consumer_key.clone(),
+                        redirect_uri.clone(),
+                    );
+                    let login_code = auth_client.login_code().await.unwrap();
+                    let redirection_uri = pocket::auth::redirection_uri(&login_code, &redirect_uri);
+                    println!("Please visit {}", redirection_uri);
+                    println!("Please press enter after you have authenticated");
+                    let mut input = String::new();
+                    std::io::stdin().read_line(&mut input).unwrap();
+
+                    let login_response = auth_client
+                        .access_token(&login_code)
+                        .await
+                        .expect("error getting access token");
+
+                    kv_config
+                        .set_pocket_access_token(&login_response.access_token)
+                        .await
+                        .expect("error setting pocket access token");
                 }
                 PocketCommands::Archive { items } => {
                     if items.is_empty() {
                         eprintln!("No items to archive");
                         return;
                     }
+                    let access_token = access_token.expect("no access token available");
+                    let mut pocket = PocketClient::new(&config.pocket_consumer_key, &access_token);
                     pocket.archive(items).await.unwrap();
                 }
                 PocketCommands::Sync => {
-                    let dirs = get_dirs();
-                    let pool = localdb::open_database(
-                        dirs.data_local_dir().join(DATABASE_PATH).to_str().unwrap(),
-                    )
-                    .await
-                    .unwrap();
+                    let pool = localdb::open_database(config.database_dir.to_str().unwrap())
+                        .await
+                        .unwrap();
                     let mut db = localdb::LocalDb::new(pool.clone());
-                    let mut kv_db = KvDB::new(pool.clone());
-                    let since = kv_db
-                        .get_kv::<i32>("pocket_since")
-                        .await
-                        .map(|k| k.value)
-                        .ok();
-
-                    let offset = kv_db
-                        .get_kv::<i32>("pocket_offset")
-                        .await
-                        .map(|k| k.value)
-                        .ok();
+                    let since = kv_config.get_pocket_since().await;
+                    let offset = kv_config.get_pocket_offset().await;
 
                     let (since, mut offset) = match (since, offset) {
                         (Some(since), _) => (since, 0),
@@ -111,6 +132,8 @@ async fn main() {
                         DateTime::from_timestamp(since as i64, 0).expect("unexpected date time");
                     println!("Syncing data since {} with offset {}", datetime, offset);
 
+                    let access_token = access_token.expect("no access token available");
+                    let mut pocket = PocketClient::new(&config.pocket_consumer_key, &access_token);
                     loop {
                         let response = pocket
                             .get(GetOptions {
@@ -129,20 +152,11 @@ async fn main() {
                         }
 
                         offset += 30;
-                        kv_db
-                            .set_kv(&("pocket_offset", offset).into())
-                            .await
-                            .unwrap();
+                        kv_config.set_pocket_since(response.since).await.unwrap();
 
                         let has_more = response.has_more().expect("invalid request");
                         if response.list.is_empty() || !has_more {
-                            kv_db
-                                .set_kv(
-                                    &("pocket_since".to_string(), response.since.to_string())
-                                        .into(),
-                                )
-                                .await
-                                .unwrap();
+                            kv_config.set_pocket_since(response.since).await.unwrap();
                             break;
                         }
                     }
@@ -188,8 +202,9 @@ async fn main() {
                 .collect::<Vec<_>>();
             tags.push("readlater".to_string());
 
-            let mut pocket =
-                PocketClient::new(&config.pocket_consumer_key, &config.pocket_access_token);
+            let access_token = kv_config.get_pocket_access_token().await;
+            let access_token = access_token.expect("no access token available");
+            let mut pocket = PocketClient::new(&config.pocket_consumer_key, &access_token);
             pocket
                 .add(vec![AddUrlRequest::new(url).tags(tags)])
                 .await

@@ -9,13 +9,12 @@ pocket = { path = "pkg/pocket" }
 localdb = { path = "pkg/localdb" }
 
 anyhow = "1.0.96"
-clap = { version = "4.5.30", features = ["derive"] }
+clap = { version = "4.5.31", features = ["derive"] }
 tokio = { version = "1", features = ["full"] }
 open = "5.3.2"
 native_messaging = "0.1.1"
 serde_json = "1.0.139"
 serde = { version = "1.0", features = ["derive"] }
-figment = { version = "0.10", features = ["toml", "env"] }
 directories = "6.0.0"
 chrono = "0.4.39"
 
@@ -26,7 +25,7 @@ members = [ "pkg/localdb",
 
 [workspace.dependencies]
 thiserror = "2.0.11"
-serde_json = "1.0.138"
+serde_json = "1.0.139"
 serde = { version = "1.0", features = ["derive"] }
 url = {version = "2.5.4", features = ["serde"]}
 reqwest = { version = "0.12.12", features = ["json"] }
