@@ -4,5 +4,8 @@ expression: options
 ---
 {
   "state": "unread",
-  "count": 10
+  "sort": "oldest",
+  "detailType": "simple",
+  "count": 30,
+  "total": "1"
 }

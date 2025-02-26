@@ -13,6 +13,23 @@ where
     }
 }
 
+pub fn ser_opt_as_str<S>(value: &Option<i32>, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    match value {
+        Some(v) => serializer.serialize_str(v.to_string().as_str()),
+        None => serializer.serialize_str("null"),
+    }
+}
+
+pub fn ser_as_str<S>(value: i32, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    serializer.serialize_str(&value.to_string())
+}
+
 pub fn serialize_vec_as_comma_separated<S>(vec: &[String], serializer: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,

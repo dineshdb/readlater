@@ -8,10 +8,11 @@ expression: options
   "tag": "linux",
   "content_type": "article",
   "sort": "title",
-  "detail_type": "complete",
+  "detailType": "complete",
   "search": "example",
   "domain": "example.org",
   "since": "1738297033",
   "count": 10,
+  "total": "1",
   "offset": 10
 }

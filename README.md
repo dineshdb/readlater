@@ -52,7 +52,7 @@ javascript: (function () {
         `readlater://save?url=<url>&title=<title>&tags=<tags>`
   - [x] Save new urls to Pocket
   - Save links to pocket even when offline
-    - [ ] Local cache of remote data
+    - [x] Local cache of remote data
     - [ ] Queue of save actions and background sync
   - [ ] Tag imdb links as watchlater
   - [ ] Tag archived imdb links as watched
@@ -72,8 +72,6 @@ javascript: (function () {
   - [x] Tests
   - [ ] Release Binaries on Github packages
   - [ ] Add a install script
-- [x] Get access token from keyring or `readlater.conf`
-- [ ] Get access token via login
 - [ ] Decouple it from Pocket and make it pluggable.
 
 ## License
